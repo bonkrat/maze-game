@@ -1,4 +1,11 @@
-import { Maze, MazeManager, MazeRenderer } from "./class";
+import {
+  Game,
+  GameRenderer,
+  Maze,
+  MazeManager,
+  MazeRenderer,
+  Player,
+} from "./class";
 
 function wait(ms) {
   return new Promise((resolve, reject) => {
@@ -8,9 +15,7 @@ function wait(ms) {
   });
 }
 
-const size = 5;
-const maze = new Maze(size);
-MazeManager.build(maze);
+const size = 10;
 
 const randomCell = () => ({
   x: Math.floor(Math.random() * size),
@@ -27,6 +32,35 @@ const randomStartEnd = () => {
 //   pathLength = maze.findPath(coords[0], coords[1]);
 // } while (pathLength < 3);
 
-const coords = randomStartEnd();
-MazeManager.solve(coords[0], coords[1], maze);
-new MazeRenderer(document).paint(maze);
+const gameRenderer = new GameRenderer(500 / size);
+const game = new Game(size);
+
+const render = () => {
+  let canvas = document.getElementById("maze");
+  let ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, 500, 500);
+
+  new MazeRenderer(document).paint(game.maze);
+  gameRenderer.drawPlayer(game.player);
+};
+
+let previousTimeStamp, start;
+function step(timestamp) {
+  if (start === undefined) {
+    start = timestamp;
+  }
+
+  const elapsed = timestamp - start;
+
+  if (previousTimeStamp !== timestamp) {
+    game.update();
+    render();
+  }
+
+  // if (elapsed < 2000) {
+  previousTimeStamp = timestamp;
+  requestAnimationFrame(step);
+  // }
+}
+
+window.requestAnimationFrame(step);

@@ -54,18 +54,18 @@ export class MazeRenderer {
       this.drawLine(cellX, cellY, cellSize, wall);
     });
 
-    if (cell.pathed) {
-      this.ctx.fillStyle = "purple";
-      this.ctx.fillRect(cellX, cellY, cellSize, cellSize);
-    }
+    // if (cell.pathed) {
+    //   this.ctx.fillStyle = "purple";
+    //   this.ctx.fillRect(cellX, cellY, cellSize, cellSize);
+    // }
 
-    if (cell.start) {
-      this.ctx.fillStyle = "yellow";
-      this.ctx.fillRect(cellX, cellY, cellSize, cellSize);
-    }
+    // if (cell.start) {
+    //   this.ctx.fillStyle = "yellow";
+    //   this.ctx.fillRect(cellX, cellY, cellSize, cellSize);
+    // }
 
     if (cell.end) {
-      this.ctx.fillStyle = "green";
+      this.ctx.fillStyle = "aliceblue";
       this.ctx.fillRect(cellX, cellY, cellSize, cellSize);
     }
   }

@@ -69,6 +69,9 @@ export class MazeManager {
   static build(maze: Maze) {
     const stack: BuilderCell[] = [],
       visitCell = (cell) => {
+        // if (!cell) {
+        //   debugger;
+        // }
         cell.visited = true;
         stack.push(cell);
       },

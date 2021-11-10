@@ -18,6 +18,10 @@ export class Maze extends Array {
     }
   }
 
+  getEndCell(): Cell {
+    return this.filter((c: Cell) => c.end)[0];
+  }
+
   getCell(x: number, y: number): Cell {
     return this[x + this.size * y];
   }
