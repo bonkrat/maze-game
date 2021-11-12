@@ -5,6 +5,7 @@ export class MazeRenderer {
   document: Document;
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
+  timestamp: number;
 
   constructor(document: Document) {
     this.canvas = document.getElementById("maze") as HTMLCanvasElement;
@@ -17,8 +18,10 @@ export class MazeRenderer {
     cellX: number,
     cellY: number,
     cellSize: number,
-    wall: string
+    wall: string,
+    lineColor: string
   ) {
+    this.ctx.imageSmoothingEnabled = false;
     this.ctx.beginPath();
 
     if (wall === "right") {
@@ -42,16 +45,18 @@ export class MazeRenderer {
     }
 
     this.ctx.closePath();
+    this.ctx.lineWidth = 40;
+    this.ctx.strokeStyle = lineColor;
     this.ctx.stroke();
   }
 
-  private drawCell(cell: Cell, cellSize: number) {
+  private drawCell(cell: Cell, cellSize: number, lineColor: string) {
     // TODO FIX THESE COORDS!!
     const cellX = cell.y * cellSize;
     const cellY = cell.x * cellSize;
 
     cell.walls.forEach((wall) => {
-      this.drawLine(cellX, cellY, cellSize, wall);
+      this.drawLine(cellX, cellY, cellSize, wall, lineColor);
     });
 
     // if (cell.pathed) {
@@ -65,16 +70,25 @@ export class MazeRenderer {
     // }
 
     if (cell.end) {
-      this.ctx.fillStyle = "aliceblue";
-      this.ctx.fillRect(cellX, cellY, cellSize, cellSize);
+      const offset = (Math.sin(this.timestamp / 3000) * cellSize) / 10;
+      this.ctx.fillStyle = "pink";
+      const endSize = cellSize / 2;
+      this.ctx.fillRect(
+        cellX + (cellSize - endSize) / 2,
+        cellY + (cellSize - endSize) / 2 + offset,
+        endSize,
+        endSize
+      );
+      this.ctx.fillStyle = lineColor;
     }
   }
 
-  paint(maze: Maze) {
+  paint(maze: Maze, lineColor: string, timestamp: number) {
     const cellWidth = this.canvas.width / maze.size;
+    this.timestamp = timestamp;
 
     for (var i = 0; i < maze.length; i++) {
-      this.drawCell(maze[i], cellWidth);
+      this.drawCell(maze[i], cellWidth, lineColor);
     }
   }
 }

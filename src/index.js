@@ -1,11 +1,4 @@
-import {
-  Game,
-  GameRenderer,
-  Maze,
-  MazeManager,
-  MazeRenderer,
-  Player,
-} from "./class";
+import { Game, GameRenderer } from "./class";
 
 function wait(ms) {
   return new Promise((resolve, reject) => {
@@ -15,33 +8,17 @@ function wait(ms) {
   });
 }
 
-const size = 10;
-
-const randomCell = () => ({
-  x: Math.floor(Math.random() * size),
-  y: Math.floor(Math.random() * size),
-});
-
-const randomStartEnd = () => {
-  return [randomCell(), randomCell()];
-};
-
-// let pathLength = 0;
-// do {
-//   const coords = randomStartEnd();
-//   pathLength = maze.findPath(coords[0], coords[1]);
-// } while (pathLength < 3);
-
-const gameRenderer = new GameRenderer(500 / size);
+let canvas = document.getElementById("maze");
+let ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const size = 6;
+const gameRenderer = new GameRenderer(canvas.width / size / 2);
 const game = new Game(size);
 
-const render = () => {
-  let canvas = document.getElementById("maze");
-  let ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, 500, 500);
-
-  new MazeRenderer(document).paint(game.maze);
-  gameRenderer.drawPlayer(game.player);
+const render = (timestamp) => {
+  ctx.clearRect(0, 0, canvas.width, canvas.width);
+  gameRenderer.draw(game, timestamp);
 };
 
 let previousTimeStamp, start;
@@ -54,7 +31,7 @@ function step(timestamp) {
 
   if (previousTimeStamp !== timestamp) {
     game.update();
-    render();
+    render(timestamp);
   }
 
   // if (elapsed < 2000) {

@@ -32,6 +32,9 @@ export class Game {
   initializePlayer(player: Player) {
     this.player = new Player(0, 0);
     document.addEventListener("keydown", this.updatePlayer.bind(this));
+    ["swipeRight", "swipeLeft", "swipeUp", "swipeDown"].forEach((dir) =>
+      document.addEventListener(dir, this.updatePlayerSwipe.bind(this))
+    );
   }
 
   private jumpPlayerPosition(direction) {
@@ -67,6 +70,24 @@ export class Game {
             .walls.has("bottom"))) &&
       !this.maze.getCell(this.player.y, this.player.x).walls.has(direction)
     );
+  }
+
+  updatePlayerSwipe(e) {
+    const mazeCell = this.maze.getCell(this.player.y, this.player.x);
+    [
+      ["swipeUp", "top"],
+      ["swipeLeft", "left"],
+      ["swipeDown", "bottom"],
+      ["swipeRight", "right"],
+    ].forEach(([type, pos]) => {
+      if (e?.type === type) {
+        if (!mazeCell.walls.has(pos as Wall)) {
+          this.jumpPlayerPosition(pos);
+        } else {
+          document.dispatchEvent(new Event("collide"));
+        }
+      }
+    });
   }
 
   updatePlayer(e) {
