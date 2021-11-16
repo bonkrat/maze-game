@@ -1,5 +1,7 @@
 # maze-game
 
+[Demo](https://maze-game-plum.vercel.app/)
+
 A simple, one-handed maze game. 
 
-Mostly just practicing simple algorithms and data structures.
+Trying to think of some fun things to add to this.
