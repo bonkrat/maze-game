@@ -2,12 +2,13 @@
   "name": "maze-game",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
+    "start": "parcel index.html",
+    "vercel-build": "parcel build --dist-dir public src/index.html",
     "test": "jest"
   },
   "keywords": [],
-  "author": "",
+  "author": "bonkrat",
   "license": "ISC",
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.16.0",
