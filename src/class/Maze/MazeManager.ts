@@ -12,7 +12,8 @@ export class MazeManager {
   private static getNewNeighbors(
     builderCell: BuilderCell,
     mazeCells: BuilderCell[],
-    mazeSize: number
+    mazeSize: number,
+    mazeHeight: number
   ) {
     return [
       [0, -1],
@@ -25,8 +26,8 @@ export class MazeManager {
         const xCoord =
             cell.x + n[0] < 0
               ? 0
-              : cell.x + n[0] >= mazeSize
-              ? mazeSize - 1
+              : cell.x + n[0] >= mazeHeight / mazeSize
+              ? mazeHeight / mazeSize - 1
               : cell.x + n[0],
           yCoord =
             cell.y + n[1] < 0
@@ -35,12 +36,12 @@ export class MazeManager {
               ? mazeSize - 1
               : cell.y + n[1];
 
-        return mazeCells[xCoord + mazeSize * yCoord];
+        return mazeCells[xCoord + (mazeHeight / mazeSize) * yCoord];
       })
       .filter((builderCell: BuilderCell) => !builderCell.visited);
   }
 
-  private static breakWalls(cell, cell2) {
+  private static breakWalls(cell: Cell, cell2: Cell) {
     // Right
     if (cell.x + 1 === cell2.x && cell.y === cell2.y) {
       cell.walls.delete("bottom");
@@ -69,9 +70,6 @@ export class MazeManager {
   static build(maze: Maze) {
     const stack: BuilderCell[] = [],
       visitCell = (cell) => {
-        // if (!cell) {
-        //   debugger;
-        // }
         cell.visited = true;
         stack.push(cell);
       },
@@ -85,7 +83,12 @@ export class MazeManager {
 
     do {
       const currentCell = stack.pop();
-      const neighbors = this.getNewNeighbors(currentCell, mazeCells, maze.size);
+      const neighbors = this.getNewNeighbors(
+        currentCell,
+        mazeCells,
+        maze.size,
+        maze.height
+      );
 
       if (neighbors.length > 0) {
         visitCell(currentCell);

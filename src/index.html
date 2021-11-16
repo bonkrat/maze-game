@@ -13,15 +13,17 @@
       /* padding: 16px 0; */
     }
     #maze {
+      height: 90%;
       border: 5px solid white;
     }
   </style>
 </head>
 <body>
   <div id="game">
-    <canvas id="maze" width="800" height="800"></canvas>
+    <canvas id="maze" width="600" height="1450"></canvas>
   </div>
   <script>
+    // Swipe events handlers.
     document.addEventListener("touchstart", handleTouchStart, false);
     document.addEventListener("touchmove", handleTouchMove, false);
 
@@ -55,24 +57,18 @@
       var yDiff = yDown - yUp;
 
       if (Math.abs(xDiff) > Math.abs(yDiff)) {
-        /*most significant*/
         if (xDiff > 0) {
           document.dispatchEvent(new Event("swipeLeft"));
-          /* right swipe */
         } else {
           document.dispatchEvent(new Event("swipeRight"));
-          /* left swipe */
         }
       } else {
         if (yDiff > 0) {
-          /* down swipe */
           document.dispatchEvent(new Event("swipeUp"));
         } else {
-          /* up swipe */
           document.dispatchEvent(new Event("swipeDown"));
         }
       }
-      /* reset values */
       xDown = null;
       yDown = null;
     }

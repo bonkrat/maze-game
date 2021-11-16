@@ -1,8 +1,8 @@
-import { Cell, Maze, MazeRenderer, Player } from ".";
+import { Game, Maze, MazeRenderer, Player, Wall } from ".";
 import { PlayerBump } from "./Effects/PlayerBump";
 import { PlayerTail } from "./Effects/PlayerTail";
 import { ScreenShake } from "./Effects/ScreenShake";
-import { Wall } from "./Maze/Cell";
+import { WALLS } from "./Maze/Cell";
 
 export class GameRenderer {
   playerSize: number;
@@ -20,7 +20,7 @@ export class GameRenderer {
   screenShake: ScreenShake[];
   screenPos: { x: number; y: number };
 
-  constructor(playerSize) {
+  constructor(playerSize: number) {
     this.playerSize = playerSize;
     this.canvas = document.getElementById("maze") as HTMLCanvasElement;
     this.ctx = this.canvas.getContext("2d");
@@ -32,9 +32,16 @@ export class GameRenderer {
     this.playerBump = new PlayerBump(this.timestamp, "top");
     this.screenShake = [];
     this.screenPos = { x: 0, y: 0 };
+
+    WALLS.forEach((pos: Wall) => {
+      document.addEventListener(`collide${pos}`, () => {
+        this.screenShake.push(new ScreenShake(this.timestamp, pos));
+      });
+    });
   }
 
   resetScreen() {
+    // TODO Refactor into ctx.save(); and ctx.reset();
     this.ctx.translate(-this.screenPos.x, -this.screenPos.y);
     this.screenPos.x = 0;
     this.screenPos.y = 0;
@@ -47,7 +54,7 @@ export class GameRenderer {
     if (this.screenShake.length) {
       this.screenShake.forEach((shake, i) => {
         const dt = this.timestamp - shake.timestamp;
-        const jiggleAmount = 10;
+        const jiggleAmount = 15;
 
         if (dt < shake.duration) {
           let xPos = 0,
@@ -65,6 +72,7 @@ export class GameRenderer {
           this.ctx.translate(xPos, yPos);
         } else {
           // Remove stale shakes
+          // TODO Refactor to not remove screen shakes.
           if (this.screenShake.length === 1) {
             this.screenShake = [];
           } else {
@@ -77,7 +85,7 @@ export class GameRenderer {
     new MazeRenderer(document).paint(maze, this.color, this.timestamp);
   }
 
-  drawPlayerTail(player: Player, maze: Maze) {
+  drawPlayerTail(maze: Maze) {
     this.ctx.fillStyle = this.color;
 
     this.playerTrails.forEach((tail: PlayerTail, i) => {
@@ -104,19 +112,11 @@ export class GameRenderer {
     }
 
     const cellSize = this.canvas.width / maze.size;
-    // TODO FIX THESE COORDS
-    const playerCellWalls = maze.getCell(player.y, player.x).walls;
 
     // Add player movement effects.
     if (this.previousPosition.x !== player.x) {
       if (this.previousPosition.x > player.x) {
         for (var i = this.previousPosition.x; i > player.x; i--) {
-          if (playerCellWalls.has("left")) {
-            this.screenShake.push(
-              new ScreenShake(this.timestamp, "left" as Wall)
-            );
-          }
-
           this.playerBump.timestamp = this.timestamp;
           this.playerBump.position = "left";
 
@@ -126,12 +126,6 @@ export class GameRenderer {
         }
       } else {
         for (var i = this.previousPosition.x; i < player.x; i++) {
-          if (playerCellWalls.has("right")) {
-            this.screenShake.push(
-              new ScreenShake(this.timestamp, "right" as Wall)
-            );
-          }
-
           this.playerBump.timestamp = this.timestamp;
           this.playerBump.position = "right";
 
@@ -143,12 +137,6 @@ export class GameRenderer {
     } else if (this.previousPosition.y !== player.y) {
       if (this.previousPosition.y > player.y) {
         for (var i = this.previousPosition.y; i > player.y; i--) {
-          if (playerCellWalls.has("top")) {
-            this.screenShake.push(
-              new ScreenShake(this.timestamp, "top" as Wall)
-            );
-          }
-
           this.playerBump.timestamp = this.timestamp;
           this.playerBump.position = "top";
 
@@ -158,12 +146,6 @@ export class GameRenderer {
         }
       } else {
         for (var i = this.previousPosition.y; i < player.y; i++) {
-          if (playerCellWalls.has("bottom")) {
-            this.screenShake.push(
-              new ScreenShake(this.timestamp, "bottom" as Wall)
-            );
-          }
-
           this.playerBump.timestamp = this.timestamp;
           this.playerBump.position = "bottom";
 
@@ -174,7 +156,7 @@ export class GameRenderer {
       }
     }
 
-    this.drawPlayerTail(player, maze);
+    this.drawPlayerTail(maze);
 
     this.ctx.fillStyle = this.color;
 
@@ -216,7 +198,7 @@ export class GameRenderer {
     this.ctx.fillStyle = this.backgroundColor;
   }
 
-  draw(game, timestamp) {
+  draw(game: Game, timestamp: number) {
     this.timestamp = timestamp;
 
     if (!this.previousTimestamp) {

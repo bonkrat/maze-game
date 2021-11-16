@@ -45,7 +45,7 @@ export class MazeRenderer {
     }
 
     this.ctx.closePath();
-    this.ctx.lineWidth = 40;
+    this.ctx.lineWidth = 50;
     this.ctx.strokeStyle = lineColor;
     this.ctx.stroke();
   }
@@ -59,23 +59,12 @@ export class MazeRenderer {
       this.drawLine(cellX, cellY, cellSize, wall, lineColor);
     });
 
-    // if (cell.pathed) {
-    //   this.ctx.fillStyle = "purple";
-    //   this.ctx.fillRect(cellX, cellY, cellSize, cellSize);
-    // }
-
-    // if (cell.start) {
-    //   this.ctx.fillStyle = "yellow";
-    //   this.ctx.fillRect(cellX, cellY, cellSize, cellSize);
-    // }
-
     if (cell.end) {
-      const offset = (Math.sin(this.timestamp / 3000) * cellSize) / 10;
       this.ctx.fillStyle = "pink";
-      const endSize = cellSize / 2;
+      const endSize = cellSize / 3;
       this.ctx.fillRect(
         cellX + (cellSize - endSize) / 2,
-        cellY + (cellSize - endSize) / 2 + offset,
+        cellY + (cellSize - endSize) / 2,
         endSize,
         endSize
       );

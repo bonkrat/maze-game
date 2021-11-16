@@ -1,25 +1,10 @@
 import { Game, GameRenderer } from "./class";
 
-function wait(ms) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(ms);
-    }, ms);
-  });
-}
-
-let canvas = document.getElementById("maze");
-let ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-const size = 6;
-const gameRenderer = new GameRenderer(canvas.width / size / 2);
-const game = new Game(size);
-
-const render = (timestamp) => {
-  ctx.clearRect(0, 0, canvas.width, canvas.width);
-  gameRenderer.draw(game, timestamp);
-};
+const canvas = document.getElementById("maze"),
+  ctx = canvas.getContext("2d"),
+  size = 5,
+  gameRenderer = new GameRenderer(canvas.width / size / 3),
+  game = new Game(size, 60);
 
 let previousTimeStamp, start;
 function step(timestamp) {
@@ -27,17 +12,13 @@ function step(timestamp) {
     start = timestamp;
   }
 
-  const elapsed = timestamp - start;
-
   if (previousTimeStamp !== timestamp) {
-    game.update();
-    render(timestamp);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    gameRenderer.draw(game, timestamp);
   }
 
-  // if (elapsed < 2000) {
   previousTimeStamp = timestamp;
   requestAnimationFrame(step);
-  // }
 }
 
 window.requestAnimationFrame(step);

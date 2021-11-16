@@ -1,19 +1,25 @@
-import { Maze, MazeManager, Player } from ".";
-import { Wall } from "./Maze/Cell";
+import { Maze, MazeManager, Player, Wall } from ".";
 
 export class Game {
   player: Player;
   maze: Maze;
   size: number;
+  height: number;
 
-  constructor(size = 10) {
+  /**
+   *
+   * @param size The number of horizontal cells.
+   * @param height The height in pixels.
+   */
+  constructor(size = 10, height = 10) {
     this.size = size;
+    this.height = height;
     this.generateMaze();
-    this.initializePlayer(new Player(0, 0));
+    this.initializePlayer();
   }
 
   generateMaze() {
-    this.maze = new Maze(this.size);
+    this.maze = new Maze(this.size, this.height);
     MazeManager.build(this.maze);
 
     const randomCell = () => ({
@@ -22,14 +28,14 @@ export class Game {
     });
 
     const randomStartEnd = () => {
-      return [randomCell(), randomCell()];
+      return [randomCell(), this.maze[this.maze.length - 1]];
     };
 
     const coords = randomStartEnd();
     MazeManager.solve(coords[0], coords[1], this.maze);
   }
 
-  initializePlayer(player: Player) {
+  initializePlayer() {
     this.player = new Player(0, 0);
     document.addEventListener("keydown", this.updatePlayer.bind(this));
     ["swipeRight", "swipeLeft", "swipeUp", "swipeDown"].forEach((dir) =>
@@ -37,7 +43,7 @@ export class Game {
     );
   }
 
-  private jumpPlayerPosition(direction) {
+  private jumpPlayerPosition(direction: Wall) {
     do {
       switch (direction) {
         case "top":
@@ -72,7 +78,7 @@ export class Game {
     );
   }
 
-  updatePlayerSwipe(e) {
+  updatePlayerSwipe(e: Event) {
     const mazeCell = this.maze.getCell(this.player.y, this.player.x);
     [
       ["swipeUp", "top"],
@@ -84,13 +90,13 @@ export class Game {
         if (!mazeCell.walls.has(pos as Wall)) {
           this.jumpPlayerPosition(pos);
         } else {
-          document.dispatchEvent(new Event("collide"));
+          document.dispatchEvent(new Event(`collide${pos}`));
         }
       }
     });
   }
 
-  updatePlayer(e) {
+  updatePlayer(e: KeyboardEvent) {
     // TODO FIX COORDS!!
     const mazeCell = this.maze.getCell(this.player.y, this.player.x);
     [
@@ -98,12 +104,16 @@ export class Game {
       ["a", "left"],
       ["s", "bottom"],
       ["d", "right"],
+      ["swipeUp", "top"],
+      ["swipeLeft", "left"],
+      ["swipeDown", "bottom"],
+      ["swipeRight", "right"],
     ].forEach(([key, pos]) => {
       if (e.key === key) {
         if (!mazeCell.walls.has(pos as Wall)) {
-          this.jumpPlayerPosition(pos);
+          this.jumpPlayerPosition(pos as Wall);
         } else {
-          document.dispatchEvent(new Event("collide"));
+          document.dispatchEvent(new Event(`collide${pos}`));
         }
       }
     });
@@ -119,6 +129,4 @@ export class Game {
     this.player.x = 0;
     this.player.y = 0;
   }
-
-  update() {}
 }
